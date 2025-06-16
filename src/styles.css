@@ -1,1 +1,20 @@
-/* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+
+@font-face {
+  font-family: "SFProDisplay";
+  src: url("/assets/fonts/sf-pro-display/regular.otf") format("woff2"),
+    url("/assets/fonts/sf-pro-display/regular.otf") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@import "./config.css";
+@import "./global.config.css";
+
+body {
+  /* font-family: "SFProDisplay", sans-serif; */
+}
+
+html {
+  scroll-behavior: smooth;
+}

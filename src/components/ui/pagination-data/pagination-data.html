@@ -1,0 +1,88 @@
+<div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4">
+  <!-- Informations de pagination -->
+  <div class="text-sm text-gray-700 order-2 sm:order-1">
+    <span>
+      Affichage de
+      <span class="font-medium">{{ startItem() }}</span>
+      à
+      <span class="font-medium">{{ endItem() }}</span>
+      sur
+      <span class="font-medium">{{ paginationData().totalCount }}</span>
+      résultats
+    </span>
+  </div>
+  <!-- Navigation -->
+  <div class="flex items-center gap-2 order-1 sm:order-2">
+    <!-- Bouton Précédent -->
+    <button
+      [disabled]="!paginationData().hasPrevious"
+      (click)="goToPreviousPage()"
+      class="inline-flex items-center justify-center p-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+    >
+      <svg
+        class="w-4 h-4 mr-1"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M15 19l-7-7 7-7"
+        ></path>
+      </svg>
+    </button>
+    <!-- Pages -->
+    <div class="hidden sm:flex items-center gap-1">
+      @for (page of visiblePages(); track page) { @if (page === -1) {
+      <span class="px-3 py-2 text-sm text-gray-500">...</span>
+      } @else {
+      <button [class]="getPageButtonClass(page)" (click)="goToPage(page)">
+        {{ page }}
+      </button>
+      } }
+    </div>
+    <!-- Info page mobile -->
+    <div
+      class="sm:hidden px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md"
+    >
+      {{ paginationData().currentPage }} / {{ paginationData().totalPages }}
+    </div>
+    <!-- Bouton Suivant -->
+    <button
+      [disabled]="!paginationData().hasNext"
+      (click)="goToNextPage()"
+      class="inline-flex items-center justify-center p-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+    >
+      <svg
+        class="w-4 h-4 ml-1"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 5l7 7-7 7"
+        ></path>
+      </svg>
+    </button>
+  </div>
+  <!-- Sélecteur de taille de page -->
+  @if (showPageSizeSelector()) {
+  <div class="flex items-center gap-2 text-sm order-3">
+    <label class="text-gray-700">Éléments par page:</label>
+    <select
+      [value]="paginationData().pageSize"
+      (change)="onPageSizeChange($event)"
+      class="border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    >
+      @for (size of pageSizeOptions(); track size) {
+      <option [value]="size">{{ size }}</option>
+      }
+    </select>
+  </div>
+  }
+</div>

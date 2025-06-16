@@ -1,0 +1,241 @@
+<div class="form-control flex flex-col mb-4 relative">
+  @if (label()) {
+  <label class="label mb-2">
+    <span class="label-text">
+      {{ label() }} @if (required()) {
+      <span class="text-red-500 ml-1">*</span>
+      }
+    </span>
+  </label>
+  }
+
+  <div class="relative" style="z-index: 9000" #selectContainer>
+    <!-- Select principal -->
+    <div
+      #selectButton
+      [class]="selectClasses()"
+      (click)="toggleDropdown()"
+      (keydown)="onKeydown($event)"
+      [attr.aria-expanded]="isOpen()"
+      [attr.aria-haspopup]="true"
+      [attr.aria-labelledby]="label() ? 'select-label' : null"
+      role="combobox"
+      tabindex="0"
+    >
+      <!-- Contenu du select -->
+      <div class="flex-1 flex flex-wrap items-center gap-1 min-h-[1.5rem]">
+        <!-- Mode multiple - Tags -->
+        @if (multiple()) { @if (selectedOptions().length === 0) {
+        <span class="text-gray-500">{{ placeholder() }}</span>
+        } @else { @for (option of selectedOptions(); track option.value) {
+        <div
+          class="inline-flex items-center gap-1 px-2 py-1 bg-primary text-white text-sm rounded-md"
+        >
+          @if (option.icon) {
+          <i [class]="option.icon" class="text-xs"></i>
+          }
+          <span>{{ option.label }}</span>
+          @if (!readonly() && !disabled()) {
+          <button
+            type="button"
+            (click)="removeOption($event, option)"
+            class="ml-1 hover:bg-red-500 rounded-full p-0.5 transition-colors"
+            [attr.aria-label]="'Retirer ' + option.label"
+          >
+            <svg
+              class="w-3 h-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+          }
+        </div>
+        } } } @else {
+        <!-- Mode simple -->
+        @if (selectedOptions().length === 0) {
+        <span class="text-gray-500">{{ placeholder() }}</span>
+        } @else {
+        <div class="flex items-center gap-2">
+          @if (selectedOptions()[0].icon) {
+          <i [class]="selectedOptions()[0].icon" class="text-gray-600"></i>
+          }
+          <span>{{ selectedOptions()[0].label }}</span>
+        </div>
+        } }
+      </div>
+
+      <!-- Icônes de droite -->
+      <div class="flex items-center gap-2 ml-2">
+        <!-- Bouton clear -->
+        @if (clearable() && selectedOptions().length > 0 && !readonly() &&
+        !disabled()) {
+        <button
+          type="button"
+          (click)="clearSelection($event)"
+          class="text-gray-400 hover:text-gray-600 transition-colors"
+          [attr.aria-label]="'Effacer la sélection'"
+        >
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+        }
+
+        <!-- Indicateur de chargement -->
+        @if (loading()) {
+        <div
+          class="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-primary"
+        ></div>
+        } @else {
+        <!-- Flèche -->
+        <svg
+          class="w-4 h-4 text-gray-400 transition-transform duration-200"
+          [class.rotate-180]="isOpen()"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          ></path>
+        </svg>
+        }
+      </div>
+    </div>
+
+    <!-- Dropdown -->
+    @if (isOpen()) {
+    <div
+      class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-hidden"
+      [class.top-full]="!dropdownUp()"
+      [class.bottom-full]="dropdownUp()"
+      [class.mb-1]="dropdownUp()"
+    >
+      <!-- Champ de recherche -->
+      @if (searchable()) {
+      <div class="p-2 border-b border-gray-200">
+        <div class="relative">
+          <input
+            #searchInput
+            type="text"
+            [ngModel]="searchTerm()"
+            (ngModelChange)="onSearchChange($event)"
+            (keydown)="onSearchKeydown($event)"
+            placeholder="Rechercher..."
+            class="w-full pl-8 pr-3 py-2 text-sm border border-gray-300 rounded-[8px] focus:ring-0 focus:border-transparent"
+          />
+          <svg
+            class="absolute left-2 top-2.5 h-4 w-4 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            ></path>
+          </svg>
+        </div>
+      </div>
+      }
+
+      <!-- Options -->
+      <div class="max-h-48 overflow-y-auto">
+        @if (filteredOptions().length === 0) {
+        <div class="px-3 py-2 text-sm text-gray-500 text-center">
+          {{ searchTerm() ? 'Aucun résultat trouvé' : 'Aucune option disponible'
+          }}
+        </div>
+        } @else {
+        <!-- Groupes d'options -->
+        @for (group of groupedOptions(); track group.name) { @if (group.name) {
+        <div
+          class="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide bg-gray-50 sticky top-0"
+        >
+          {{ group.name }}
+        </div>
+        } @for (option of group.options; track option.value) {
+        <div
+          class="px-3 py-2 cursor-pointer flex items-center justify-between transition-colors"
+          [class.bg-gray-100]="focusedIndex() === getOptionIndex(option)"
+          [class.bg-primary]="isSelected(option) && focusedIndex() !== getOptionIndex(option)"
+          [class.text-white]="isSelected(option) && focusedIndex() !== getOptionIndex(option)"
+          [class.bg-primary]="isSelected(option) && focusedIndex() === getOptionIndex(option)"
+          [class.text-white]="isSelected(option) && focusedIndex() === getOptionIndex(option)"
+          [class.opacity-50]="option.disabled"
+          [class.cursor-not-allowed]="option.disabled"
+          (click)="selectOption(option)"
+          (mouseenter)="setFocusedIndex(getOptionIndex(option))"
+        >
+          <div class="flex items-center gap-2 flex-1">
+            @if (option.icon) {
+            <i [class]="option.icon" class="text-sm"></i>
+            }
+            <div class="flex-1">
+              <div class="text-sm">{{ option.label }}</div>
+              @if (option.description) {
+              <div class="text-xs opacity-75">{{ option.description }}</div>
+              }
+            </div>
+          </div>
+
+          <!-- Indicateur de sélection -->
+          @if (isSelected(option)) {
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            ></path>
+          </svg>
+          }
+        </div>
+        } } }
+      </div>
+    </div>
+    }
+  </div>
+
+  <!-- Messages d'erreur -->
+  @if (control.touched && control.errors) {
+  <div class="text-red-500 text-sm mt-1 space-y-1">
+    @if (hasError('required')) {
+    <div>{{ label() || 'Ce champ' }} est requis.</div>
+    }
+  </div>
+  }
+
+  <!-- Texte d'aide -->
+  @if (hintText()) {
+  <div class="text-gray-500 text-sm mt-1">{{ hintText() }}</div>
+  }
+</div>

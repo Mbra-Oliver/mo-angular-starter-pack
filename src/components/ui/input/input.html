@@ -1,0 +1,177 @@
+<div class="form-control flex flex-col mb-4 relative">
+  @if (label()) {
+  <label class="label mb-2">
+    <span class="label-text">
+      {{ label() }} @if (required()) {
+      <span class="text-red-500 ml-1">*</span>
+      }
+    </span>
+  </label>
+  }
+
+  <div class="relative">
+    <!-- Input principal -->
+    <input
+      #inputElement
+      [type]="inputType()"
+      [formControl]="control"
+      [class]="inputClasses()"
+      [placeholder]="placeholder()"
+      [readonly]="readonly()"
+      [min]="min()"
+      [max]="max()"
+      [step]="step()"
+      [accept]="accept()"
+      [multiple]="multiple()"
+      [pattern]="pattern() ?? ''"
+      [autocomplete]="autocomplete()"
+      [spellcheck]="spellcheck()"
+      (blur)="onTouched()"
+      (input)="onInput($event)"
+      (keydown)="onKeydown($event)"
+      (paste)="onPaste($event)"
+    />
+
+    <!-- Icône de préfixe -->
+    @if (prefixIcon()) {
+    <div
+      class="absolute inset-y-0 left-3 flex items-center pointer-events-none"
+    >
+      <i [class]="prefixIcon()" class="text-gray-400"></i>
+    </div>
+    }
+
+    <!-- Bouton toggle pour password -->
+    @if (type() === 'password') {
+    <button
+      type="button"
+      class="absolute inset-y-0 right-3 cursor-pointer flex items-center p-1 hover:text-gray-600 transition-colors"
+      (click)="togglePasswordVisibility()"
+      tabindex="-1"
+      [attr.aria-label]="isPasswordVisible() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+    >
+      @if (isPasswordVisible()) {
+      <svg
+        class="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+        ></path>
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+        ></path>
+      </svg>
+      } @else {
+      <svg
+        class="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
+        ></path>
+      </svg>
+      }
+    </button>
+    }
+
+    <!-- Icône de suffixe -->
+    @if (suffixIcon() && type() !== 'password') {
+    <div
+      class="absolute inset-y-0 right-3 flex items-center pointer-events-none"
+    >
+      <i [class]="suffixIcon()" class="text-gray-400"></i>
+    </div>
+    }
+
+    <!-- Bouton de clear -->
+    @if (clearable() && control.value && !readonly()) {
+    <button
+      type="button"
+      class="absolute inset-y-0 right-3 cursor-pointer flex items-center p-1 hover:text-gray-600 transition-colors"
+      (click)="clearValue()"
+      tabindex="-1"
+      aria-label="Effacer"
+    >
+      <svg
+        class="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"
+        ></path>
+      </svg>
+    </button>
+    }
+
+    <!-- Indicateur de chargement -->
+    @if (loading()) {
+    <div class="absolute inset-y-0 right-3 flex items-center">
+      <div
+        class="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-primary"
+      ></div>
+    </div>
+    }
+  </div>
+
+  <!-- Messages d'erreur -->
+  @if (control.touched && control.errors) {
+  <div class="text-red-500 text-sm mt-1 space-y-1">
+    @if (hasError('required')) {
+    <div>{{ label() || 'Ce champ' }} est requis.</div>
+    } @if (hasError('email')) {
+    <div>Format d'email invalide.</div>
+    } @if (hasError('minlength')) {
+    <div>Doit contenir au moins {{ minLength() }} caractères.</div>
+    } @if (hasError('maxlength')) {
+    <div>Ne peut dépasser {{ maxLength() }} caractères.</div>
+    } @if (hasError('min')) {
+    <div>La valeur minimum est {{ min() }}.</div>
+    } @if (hasError('max')) {
+    <div>La valeur maximum est {{ max() }}.</div>
+    } @if (hasError('pattern')) {
+    <div>{{ patternErrorMessage() || 'Format invalide.' }}</div>
+    } @if (hasError('url')) {
+    <div>URL invalide.</div>
+    } @if (hasError('number')) {
+    <div>Veuillez entrer un nombre valide.</div>
+    } @if (hasError('tel')) {
+    <div>Numéro de téléphone invalide.</div>
+    } @if (hasError('file-size')) {
+    <div>La taille du fichier dépasse {{ maxFileSize() }} MB.</div>
+    } @if (hasError('file-type')) {
+    <div>Type de fichier non autorisé.</div>
+    }
+  </div>
+  }
+
+  <!-- Texte d'aide -->
+  @if (hintText()) {
+  <div class="text-gray-500 text-sm mt-1">{{ hintText() }}</div>
+  }
+
+  <!-- Compteur de caractères -->
+  @if (maxLength() && showCharacterCount()) {
+  <div class="text-xs text-gray-400 mt-1 text-right">
+    {{ (control.value?.toString()?.length || 0) }} / {{ maxLength() }}
+  </div>
+  }
+</div>

@@ -1,0 +1,157 @@
+import { inject } from '@angular/core';
+import {
+  HttpInterceptorFn,
+  HttpRequest,
+  HttpEvent,
+  HttpErrorResponse,
+  HttpHandlerFn,
+} from '@angular/common/http';
+import { Router } from '@angular/router';
+import {
+  Observable,
+  throwError,
+  BehaviorSubject,
+  filter,
+  take,
+  switchMap,
+  catchError,
+  finalize,
+} from 'rxjs';
+import { AuthService } from 'src/core/services/auth';
+
+// ============================================================================
+// AUTH INTERCEPTOR - Gestion automatique des tokens et refresh (Version fonctionnelle)
+// ============================================================================
+
+// Variables partagées pour gérer le refresh token global
+let isRefreshing = false;
+let refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<
+  string | null
+>(null);
+
+export const authTokenInterceptor: HttpInterceptorFn = (req, next) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  // Ignorer les requêtes d'authentification pour éviter les boucles infinies
+  if (isAuthRequest(req)) {
+    return next(req);
+  }
+
+  // Debug pour vérifier le token
+  const token = authService.getToken();
+  console.log('🔑 Token disponible:', !!token);
+  console.log('🔒 Token expiré:', authService.isTokenExpired());
+  console.log('✅ Utilisateur authentifié:', authService.isAuthenticated());
+
+  // Ajouter le token si disponible
+  const authReq = addTokenHeader(req, authService);
+
+  // Debug pour vérifier les headers
+  console.log(
+    '📤 Headers de la requête:',
+    authReq.headers.get('Authorization')
+  );
+
+  return next(authReq).pipe(
+    catchError((error: HttpErrorResponse) => {
+      console.log('❌ Erreur HTTP:', error.status, error.message);
+
+      // Si erreur 401 et que l'utilisateur était authentifié, tenter refresh
+      if (error.status === 401 && authService.isAuthenticated()) {
+        return handle401Error(authReq, next, authService);
+      }
+
+      // Si erreur 403, rediriger vers unauthorized
+      if (error.status === 403) {
+        router.navigate(['/unauthorized']);
+      }
+
+      return throwError(() => error);
+    })
+  );
+};
+
+/**
+ * Vérifie si la requête concerne l'authentification
+ */
+function isAuthRequest(req: HttpRequest<any>): boolean {
+  const authUrls = ['/auth/login', '/auth/refresh', '/auth/setup'];
+  return authUrls.some((url) => req.url.includes(url));
+}
+
+/**
+ * Ajoute le token d'authentification à la requête
+ */
+function addTokenHeader(
+  request: HttpRequest<any>,
+  authService: AuthService
+): HttpRequest<any> {
+  const token = authService.getToken();
+
+  if (token && !authService.isTokenExpired()) {
+    console.log('🔐 Ajout du token Bearer à la requête');
+    return request.clone({
+      headers: request.headers.set('Authorization', `Bearer ${token}`),
+    });
+  }
+
+  console.log('⚠️ Pas de token valide à ajouter');
+  return request;
+}
+
+/**
+ * Gère les erreurs 401 en tentant un refresh token
+ */
+function handle401Error(
+  request: HttpRequest<any>,
+  next: HttpHandlerFn,
+  authService: AuthService
+): Observable<HttpEvent<any>> {
+  if (!isRefreshing) {
+    isRefreshing = true;
+    refreshTokenSubject.next(null);
+
+    const refreshToken = authService.getStoredRefreshToken();
+
+    if (refreshToken) {
+      console.log('🔄 Tentative de refresh token...');
+      return authService.refreshToken().pipe(
+        switchMap((response: { accessToken: string }) => {
+          console.log('✅ Refresh token réussi');
+          isRefreshing = false;
+          refreshTokenSubject.next(response.accessToken);
+
+          // Retry la requête originale avec le nouveau token
+          return next(addTokenHeader(request, authService));
+        }),
+        catchError((refreshError: any) => {
+          console.log('❌ Refresh token échoué');
+          isRefreshing = false;
+          refreshTokenSubject.next(null);
+
+          // Refresh échoué, déconnecter l'utilisateur
+          authService.logout();
+          return throwError(() => refreshError);
+        }),
+        finalize(() => {
+          isRefreshing = false;
+        })
+      );
+    } else {
+      console.log('❌ Pas de refresh token, déconnexion');
+      // Pas de refresh token, déconnecter
+      authService.logout();
+      return throwError(
+        () => new Error('Token expiré et pas de refresh token')
+      );
+    }
+  }
+
+  // Si un refresh est déjà en cours, attendre qu'il se termine
+  return refreshTokenSubject.pipe(
+    filter((token): token is string => token !== null),
+    take(1),
+    switchMap((token) => next(addTokenHeader(request, authService)))
+  );
+}

@@ -1,0 +1,282 @@
+@layer config {
+  @theme {
+    /* Primary colors */
+    --color-primary-light: #6b9080;
+    --color-primary: #228c27;
+    --color-primary-dark: #283b2b;
+
+    /* Secondary colors */
+    --color-secondary-light: #e0f0e5;
+    --color-secondary: #b3c9b0;
+    --color-secondary-dark: #879d89;
+
+    /* Dashboard green palette */
+    --color-dashboard-green-50: #f0fff4;
+    --color-dashboard-green-100: #ddfee9;
+    --color-dashboard-green-200: #b0fcd7;
+    --color-dashboard-green-300: #83fabd;
+    --color-dashboard-green-400: #56f7a2;
+    --color-dashboard-green-500: #29f488;
+    --color-dashboard-green-600: #17de74;
+    --color-dashboard-green-700: #00b85e;
+    --color-dashboard-green-800: #00924a;
+    --color-dashboard-green-900: #006c36;
+    --color-dashboard-green-950: #004622;
+
+    /* Gray palette */
+    --color-gray-50: #fafafa;
+    --color-gray-100: #f5f5f5;
+    --color-gray-200: #eeeeee;
+    --color-gray-300: #e0e0e0;
+    --color-gray-400: #bdbdbd;
+    --color-gray-500: #9e9e9e;
+    --color-gray-600: #757575;
+    --color-gray-700: #616161;
+    --color-gray-800: #424242;
+    --color-gray-900: #212121;
+
+    --color-background: #faf9fb;
+
+    /* Breakpoints modernes pour 2024/2025 */
+    --breakpoint-xs: 475px;
+    --breakpoint-sm: 640px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 1024px;
+    --breakpoint-xl: 1280px;
+    --breakpoint-2xl: 1440px;
+    --breakpoint-3xl: 1680px;
+    --breakpoint-4xl: 1920px;
+
+    /* Container configuration */
+    --container-center: true;
+    --container-padding-default: 1rem;
+    --container-padding-sm: 1.5rem;
+    --container-padding-md: 2rem;
+    --container-padding-lg: 2.5rem;
+    --container-padding-xl: 3rem;
+    --container-padding-2xl: 3.5rem;
+    --container-padding-3xl: 4rem;
+    --container-padding-4xl: 5rem;
+
+    /* Container max-widths pour grands écrans */
+    --container-max-width-sm: 640px;
+    --container-max-width-md: 768px;
+    --container-max-width-lg: 1024px;
+    --container-max-width-xl: 1280px;
+    --container-max-width-2xl: 1440px;
+    --container-max-width-3xl: 1600px;
+    --container-max-width-4xl: 1800px;
+  }
+
+  @layer utilities {
+    /* Container responsive moderne */
+    .container-responsive {
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: clamp(1rem, 4vw, 5rem);
+      padding-right: clamp(1rem, 4vw, 5rem);
+      max-width: min(100% - 2rem, 1800px);
+    }
+
+    /* Container avec Grid Layout (recommandé) */
+    .grid-container {
+      display: grid;
+      grid-template-columns:
+        [full-start] minmax(1rem, 1fr)
+        [wide-start] minmax(0, 2rem)
+        [content-start] min(100% - 4rem, 1600px)
+        [content-end] minmax(0, 2rem)
+        [wide-end] minmax(1rem, 1fr)
+        [full-end];
+    }
+
+    .grid-container > * {
+      grid-column: content;
+    }
+
+    .grid-container > .full-width {
+      grid-column: full;
+    }
+
+    .grid-container > .wide {
+      grid-column: wide;
+    }
+
+    /* Container centré pour grands écrans */
+    .container-centered {
+      width: 100%;
+      max-width: 1800px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: clamp(1rem, 5vw, 6rem);
+      padding-right: clamp(1rem, 5vw, 6rem);
+    }
+
+    /* Container fluide adaptatif */
+    .container-fluid {
+      width: 100%;
+      padding-left: clamp(0.75rem, 3vw, 4rem);
+      padding-right: clamp(0.75rem, 3vw, 4rem);
+      max-width: 1920px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Container pour contenu textuel */
+    .container-text {
+      width: 100%;
+      max-width: 75ch;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+
+    /* Container sections avec espacement généreux */
+    .container-section {
+      width: 100%;
+      max-width: 1600px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: clamp(1.5rem, 6vw, 8rem);
+      padding-right: clamp(1.5rem, 6vw, 8rem);
+    }
+
+    /* Animations existantes */
+    .animate-fadeIn {
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .animate-slideInUp {
+      animation: slideInUp 0.3s ease-out;
+    }
+
+    .animate-scaleIn {
+      animation: scaleIn 0.3s ease-out;
+    }
+
+    /* Sidebar styles existants */
+    .sidebar-logo {
+      @apply flex items-center space-x-2 bg-[#f1f8f2] border-2 border-[#c8e3c9] rounded-[8px] p-4;
+    }
+
+    .sidebar-item {
+      @apply flex items-center space-x-3 px-3 py-2 text-sm;
+    }
+
+    .sidebar-item:hover {
+      @apply bg-gray-50 rounded-[8px] transition-colors;
+    }
+
+    .sidebar-item-active {
+      @apply bg-[#C8E3C9] font-medium text-black font-bold rounded-[8px];
+    }
+
+    .sidebar-subitem {
+      @apply block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition-colors;
+    }
+
+    .sidebar-subitem-active {
+      @apply bg-green-50 text-green-700 font-medium;
+    }
+
+    .mobile-tab {
+      @apply flex flex-col items-center justify-center p-2 text-gray-600 hover:text-gray-900 transition-colors min-w-0 flex-1;
+    }
+
+    .mobile-tab-active {
+      @apply text-primary;
+    }
+
+    .mobile-submenu-item {
+      @apply block px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors;
+    }
+
+    .mobile-submenu-active {
+      @apply bg-green-50 text-green-700 font-medium;
+    }
+
+    .card-ui {
+      @apply bg-white rounded-[8px] p-6;
+    }
+
+    /* Responsive breakpoint utilities */
+    @media (min-width: 475px) {
+      .container-responsive {
+        padding-left: clamp(1.25rem, 4vw, 5rem);
+        padding-right: clamp(1.25rem, 4vw, 5rem);
+      }
+    }
+
+    @media (min-width: 768px) {
+      .container-responsive {
+        padding-left: clamp(2rem, 5vw, 6rem);
+        padding-right: clamp(2rem, 5vw, 6rem);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .container-responsive {
+        padding-left: clamp(2.5rem, 6vw, 7rem);
+        padding-right: clamp(2.5rem, 6vw, 7rem);
+      }
+    }
+
+    @media (min-width: 1440px) {
+      .container-responsive {
+        padding-left: clamp(3rem, 7vw, 8rem);
+        padding-right: clamp(3rem, 7vw, 8rem);
+        max-width: 1700px;
+      }
+    }
+
+    @media (min-width: 1680px) {
+      .container-responsive {
+        padding-left: clamp(4rem, 8vw, 10rem);
+        padding-right: clamp(4rem, 8vw, 10rem);
+        max-width: 1800px;
+      }
+    }
+
+    @media (min-width: 1920px) {
+      .container-responsive {
+        padding-left: clamp(5rem, 10vw, 12rem);
+        padding-right: clamp(5rem, 10vw, 12rem);
+        max-width: 1900px;
+      }
+    }
+  }
+
+  /* Keyframes pour les animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
