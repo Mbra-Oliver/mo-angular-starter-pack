@@ -1,0 +1,53 @@
+.table-ui {
+  border-radius: 8px;
+  background: var(--White, #fff);
+  box-shadow: 1px 3px 4px 0px rgba(27, 30, 36, 0.02);
+}
+
+.table-striped tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f3f4f6;
+}
+
+.table-sm td,
+.table-sm th {
+  padding: 0.5rem;
+}
+
+.search-input {
+  border-radius: 8px;
+  background: var(--White, #fff);
+
+  /* Border/Border input */
+  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.06),
+    0px 0px 0px 1px var(--Grey-200, #e5e5e5);
+}
+
+/* Styles pour les dropdowns d'actions */
+[data-dropdown] .absolute {
+  animation: dropdown-enter 0.15s ease-out;
+}
+
+/* Amélioration de l'accessibilité pour les boutons d'actions */
+button[aria-expanded="true"] {
+  background-color: rgb(243 244 246); /* bg-gray-100 */
+}
+
+/* Styles pour les séparateurs dans les dropdowns */
+.dropdown-divider {
+  height: 1px;
+  margin: 0.25rem 0;
+  background-color: rgb(229 231 235); /* border-gray-200 */
+}
+
+/* Hover states améliorés */
+.dropdown-item {
+  transition: all 0.15s ease-in-out;
+}
+
+.dropdown-item:hover {
+  transform: translateX(2px);
+}

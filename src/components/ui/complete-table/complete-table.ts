@@ -11,6 +11,8 @@ import {
   effect,
   DestroyRef,
   inject,
+  ElementRef,
+  HostListener,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -126,6 +128,8 @@ export interface TableState {
 
 // ===== COMPOSANT PRINCIPAL =====
 
+// ===== COMPOSANT PRINCIPAL =====
+
 @Component({
   selector: 'mo-complete-table',
   imports: [CommonModule, FormsModule, Search],
@@ -134,6 +138,7 @@ export interface TableState {
 })
 export class CompleteTable implements OnInit, OnDestroy {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly elementRef = inject(ElementRef);
 
   // === INPUTS ===
   data = input<any[]>([]);
@@ -149,7 +154,7 @@ export class CompleteTable implements OnInit, OnDestroy {
       headerBg: 'bg-gray-50',
       headerText: 'text-gray-900',
       rowHover: 'hover:bg-gray-50',
-      selectedBg: 'bg-blue-50',
+      selectedBg: 'bg-primary-light',
       fontSize: 'sm',
     },
   });
@@ -174,6 +179,8 @@ export class CompleteTable implements OnInit, OnDestroy {
   visibleColumns = computed(() =>
     this.processedColumns().filter((col) => col.visible !== false)
   );
+
+  openActionDropdowns = signal<Set<number>>(new Set());
 
   // === PROPRIÉTÉS PRIVÉES ===
   private readonly globalSearchSubject = new Subject<string>();
@@ -400,6 +407,48 @@ export class CompleteTable implements OnInit, OnDestroy {
     }).length;
 
     return validDateCount / values.length > 0.7; // 70% de dates valides
+  }
+
+  toggleActionsDropdown(rowIndex: number): void {
+    const openDropdowns = this.openActionDropdowns();
+    const newOpenDropdowns = new Set(openDropdowns);
+
+    if (newOpenDropdowns.has(rowIndex)) {
+      newOpenDropdowns.delete(rowIndex);
+    } else {
+      // Fermer tous les autres dropdowns et ouvrir celui-ci
+      newOpenDropdowns.clear();
+      newOpenDropdowns.add(rowIndex);
+    }
+
+    this.openActionDropdowns.set(newOpenDropdowns);
+  }
+
+  isActionsDropdownOpen(rowIndex: number): boolean {
+    return this.openActionDropdowns().has(rowIndex);
+  }
+
+  closeAllActionDropdowns(): void {
+    this.openActionDropdowns.set(new Set());
+  }
+
+  async executeActionFromDropdown(
+    action: TableAction,
+    item: any,
+    rowIndex: number
+  ): Promise<void> {
+    // Fermer le dropdown après l'exécution
+    this.closeActionDropdown(rowIndex);
+
+    // Exécuter l'action
+    await this.executeAction(action, item);
+  }
+
+  private closeActionDropdown(rowIndex: number): void {
+    const openDropdowns = this.openActionDropdowns();
+    const newOpenDropdowns = new Set(openDropdowns);
+    newOpenDropdowns.delete(rowIndex);
+    this.openActionDropdowns.set(newOpenDropdowns);
   }
 
   private isNumberColumn(values: any[]): boolean {
@@ -721,7 +770,9 @@ export class CompleteTable implements OnInit, OnDestroy {
     }
 
     if (isSelected) {
-      classes.push(this.config().globalStyles?.selectedBg || 'bg-primary-50');
+      classes.push(
+        this.config().globalStyles?.selectedBg || 'bg-primary-light'
+      );
     }
 
     return classes.join(' ');
@@ -974,5 +1025,13 @@ export class CompleteTable implements OnInit, OnDestroy {
       searchable: column.searchable !== false,
       priority: column.priority || 0,
     };
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    // Vérifier si le clic est en dehors du composant
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.closeAllActionDropdowns();
+    }
   }
 }

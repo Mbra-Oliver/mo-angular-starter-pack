@@ -80,9 +80,8 @@
 
   <!-- Conteneur du tableau avec scroll horizontal -->
   <div
-    class="overflow-x-auto"
+    class="overflow-x-auto bg-amber-400 overflow-y-hidden"
     [class.max-h-96]="config().globalStyles?.tableHeight === 'fixed'"
-    [class.overflow-y-auto]="config().globalStyles?.tableHeight === 'fixed'"
   >
     <table
       [class]="getTableClass()"
@@ -206,7 +205,7 @@
           @for (column of getVisibleColumns(); track column.key) {
           <td
             [class]="getCellClass(column)"
-            class="px-6 py-4"
+            class="px-6 py-4 border-r border-gray-200"
             [class.sticky-left]="column.sticky === 'left'"
             [class.sticky-right]="column.sticky === 'right'"
             role="gridcell"
@@ -216,11 +215,11 @@
             customTemplates()![column.template || column.key]) {
             <ng-container
               *ngTemplateOutlet="customTemplates()![column.template || column.key]; context: { 
-                            $implicit: item, 
-                            value: getNestedValue(item, column.key),
-                            index: i,
-                            column: column
-                          }"
+                          $implicit: item, 
+                          value: getNestedValue(item, column.key),
+                          index: i,
+                          column: column
+                        }"
             ></ng-container>
             } @else {
             <div class="text-gray-900">
@@ -233,7 +232,9 @@
               {{ formatValue(getNestedValue(item, column.key), column, item) }}
             </span>
             } @case ('actions') {
-            <div class="flex items-center space-x-1">
+            <div class="flex items-center justify-start">
+              @if (getVisibleActions(item).length === 1) {
+              <!-- Action unique - bouton direct -->
               @for (action of getVisibleActions(item); track action.id) {
               <button
                 (click)="executeAction(action, item)"
@@ -278,6 +279,97 @@
                 />
                 } {{ action.label }}
               </button>
+              } } @else if (getVisibleActions(item).length > 1) {
+              <!-- Actions multiples - dropdown -->
+              <div
+                class="relative inline-block text-left"
+                [attr.data-dropdown]="'actions-' + i"
+              >
+                <button
+                  type="button"
+                  (click)="toggleActionsDropdown(i)"
+                  class="inline-flex !cursor-pointer focus:border-0 focus:outline-0 items-center justify-center w-8 h-8 text-gray-400 rounded-full hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-0 focus:ring-offset-0"
+                  [attr.aria-expanded]="isActionsDropdownOpen(i)"
+                  [attr.aria-haspopup]="'true'"
+                  [attr.aria-label]="'Menu d\'actions pour la ligne ' + (i + 1)"
+                >
+                  <svg
+                    class="w-5 h-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M10 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM10 8.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM11.5 15.5a1.5 1.5 0 10-3 0 1.5 1.5 0 003 0z"
+                    />
+                  </svg>
+                </button>
+
+                <!-- Dropdown menu -->
+                @if (isActionsDropdownOpen(i)) {
+                <div
+                  class="absolute right-0 z-50 mt-2 w-48 rounded-md shadow-lg bg-white border border-gray-200 focus:outline-none"
+                  role="menu"
+                  [attr.aria-orientation]="'vertical'"
+                  [attr.aria-labelledby]="'menu-button-' + i"
+                >
+                  <div class="py-1" role="none">
+                    @for (action of getVisibleActions(item); track action.id) {
+                    <button
+                      (click)="executeActionFromDropdown(action, item, i)"
+                      [disabled]="action.loading"
+                      class="group flex items-center w-full hover: cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+                      [class.text-red-700]="action.color === 'danger'"
+                      [class.hover:bg-red-50]="action.color === 'danger'"
+                      [class.text-green-700]="action.color === 'success'"
+                      [class.hover:bg-green-50]="action.color === 'success'"
+                      [class.text-yellow-700]="action.color === 'warning'"
+                      [class.hover:bg-yellow-50]="action.color === 'warning'"
+                      role="menuitem"
+                      type="button"
+                      [title]="action.tooltip||''"
+                    >
+                      @if (action.loading) {
+                      <svg
+                        class="animate-spin mr-3 h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          class="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          stroke-width="4"
+                        ></circle>
+                        <path
+                          class="opacity-75"
+                          fill="currentColor"
+                          d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      } @else if (action.icon) {
+                      <i
+                        [class]="action.icon"
+                        class="mr-3 h-4 w-4 text-gray-400 group-hover:text-gray-500"
+                        aria-hidden="true"
+                      ></i>
+                      } @else if (action.imageUrl) {
+                      <img
+                        [src]="action.imageUrl"
+                        class="mr-3 h-4 w-4"
+                        [alt]="action.label"
+                      />
+                      } @else {
+                      <div class="mr-3 h-4 w-4"></div>
+                      } {{ action.label }}
+                    </button>
+                    }
+                  </div>
+                </div>
+                }
+              </div>
               }
             </div>
             } @case ('boolean') {
