@@ -1,59 +1,127 @@
-# MbraOliverStarterPack
+# 🚀 Mbra Oliver Angular Starter Pack
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.0.
+Un starter pack Angular 20+ bien structuré, moderne et extensible, prêt pour les projets professionnels utilisant les signals et les dernières nouveautés d'angular.
 
-## Development server
+> Généré avec [Angular CLI](https://github.com/angular/angular-cli) v20.0.0.
 
-To start a local development server, run:
+---
+
+## 🗂️ Structure du projet
+
+```
+src/
+├── app/
+├── components/ui/        # Composants UI réutilisables (button, input, table, etc.)
+├── core/                 # Fonctions critiques du projet
+│   ├── guards/           # AuthGuards et route protections
+│   ├── interceptors/     # Intercepteurs HTTP (auth, loader, etc.)
+│   ├── interfaces/       # Types et modèles TypeScript
+│   ├── resolvers/        # Route data resolvers
+│   ├── utils/            # Fonctions utilitaires globales
+│   └── utils-components/ # Composants utilitaires partagés
+```
+
+---
+
+## ⚙️ Prérequis
+
+- Node.js ≥ 18
+- Angular CLI ≥ 20
+- PNPM ou NPM
+
+---
+
+## 🧪 Lancer le serveur de développement
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Ouvre `http://localhost:4200/` dans ton navigateur. L’application se recharge automatiquement à chaque modification.
 
-## Code scaffolding
+---
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## 🧱 Génération de code
 
 ```bash
-ng generate component component-name
+ng generate component my-component
+ng generate service core/services/my-service
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Liste complète des options :
 
 ```bash
 ng generate --help
 ```
 
-## Building
+---
 
-To build the project run:
+## 📦 Build du projet
 
 ```bash
 ng build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Les artefacts de build sont générés dans le dossier `dist/`.
 
-## Running unit tests
+---
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## ✅ Tests unitaires
 
 ```bash
 ng test
 ```
 
-## Running end-to-end tests
+---
 
-For end-to-end (e2e) testing, run:
+## 🧪 Tests end-to-end
 
-```bash
-ng e2e
-```
+> Angular 20 ne fournit plus de framework e2e par défaut.
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Tu peux ajouter :
 
-## Additional Resources
+- Cypress
+- Playwright
+- WebdriverIO
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+---
+
+## 🌈 Fonctionnalités incluses
+
+- ✔️ Angular 20
+- ⚡ UI Components modulaires (`components/ui`)
+- 🔐 Intercepteurs HTTP personnalisés (`core/interceptors`)
+- 🧰 Utilitaires (`core/utils`)
+- 📦 Structure scalable (suivant les best practices Angular)
+- 🎨 Pré-configuré pour intégrer Tailwind CSS
+
+---
+
+## 💡 À venir (To Do)
+
+- [ ] Exemple d'utilisation des composantes
+- [ ] AuthService avec token JWT
+- [ ] Exemple complet de formulaire dynamique
+- [ ] Layout admin/public
+- [ ] Configuration SSR (Angular Universal)
+
+---
+
+## 📚 Liens utiles
+
+- [Documentation Angular](https://angular.dev/)
+- [Angular CLI Commands](https://angular.dev/tools/cli)
+- [RxJS Documentation](https://rxjs.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
+
+---
+
+## 👤 Auteur
+
+Développé par [@Mbra-Oliver](https://github.com/Mbra-Oliver)
+
+---
+
+## 🪪 Licence
+
+MIT © Mbra Oliver
